@@ -91,3 +91,54 @@ function viewAll() {
         console.table(res);
     })
 }
+
+function viewDepts() {
+    var query = "SELECT * FROM department LEFT JOIN role ON department.id = role.department_id LEFT JOIN employees ON role.id = employees.role_id"
+
+    connection.query(query, function(err, res) {
+        if(err) throw(err);
+        console.table(res);
+    })
+}
+
+function viewMgmt() {
+    inquirer
+        .prompt({
+            name: "action",
+            type: "list",
+            message: "Select manager?",
+            choices: ["Office Manager", "Histology Manager"]
+        })
+        .then(function (answer) {
+            switch (answer.action) {
+                case "Histology Manager":
+                    var query = "SELECT * FROM employees LEFT JOIN role ON role.id = employees.role_id  WHERE manager_id=1 ORDER BY role.id";
+                    connection.query(query, function(err, res) {
+                        if(err) throw(err);
+                        console.table(res);
+                    })
+                    connection.end();
+                    break;
+
+                case "Office Manager":
+                    var query = "SELECT * FROM employees LEFT JOIN role ON role.id = employees.role_id  WHERE manager_id=2 ORDER BY role.id";
+                    connection.query(query, function(err, res) {
+                        if(err) throw(err);
+                        console.table(res);
+                    })
+                    connection.end();
+                    break;
+
+                case "Go back":
+                    start();
+                    break;
+
+                case "Exit":
+                    connection.end();
+                    break;
+            }
+        });
+
+
+
+}

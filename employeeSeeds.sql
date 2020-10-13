@@ -43,7 +43,7 @@ VALUES ("Histology Manager", 85000, 2), ("Office Manager", 105000, 3), ("patholo
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
 VALUES ("Joe", "Schmeaux", 1, 1), ("Charles", "Stevens", 3, 2), ("Maren", "Chan", 3, 2), ("Heather", "Miller", 3, 2), ("Janie", "Lewis", 2, 2), ("Bo", "Jangles", 4, 1), 
-("Everett", "Montain", 4, 1), ("Tom", "Moffett", 4, 1), ("Nadine", "Peretta", 4, 1), ("Alicia", "Deleon", 3, 2), ("Diana", "Moffett", 3, 2), ("Rose", "Mcgowan", 3, 2), ("Steve", "Rodriguez", 3, 2);
+("Everett", "Montain", 5, 1), ("Tom", "Moffett", 5, 1), ("Nadine", "Peretta", 4, 1), ("Alicia", "Deleon", 6, 2), ("Diana", "Moffett", 7, 2), ("Rose", "Mcgowan", 7, 2), ("Steve", "Rodriguez", 8, 2);
 
 SELECT * FROM department;
 SELECT * FROM  role;
