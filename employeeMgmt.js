@@ -174,12 +174,20 @@ function viewMgmt() {
     }
     // Add a new employee
     function addEmp() {
+
+        // Show roles as reference
+        var query = "SELECT * FROM role";
+        connection.query(query, function (err, res) {
+            if (err) throw (err);
+            console.table(res);
+        })
+
         inquirer
             .prompt([
                 {
                     name: "first",
                     type: "input",
-                    message: "Enter employee's first name"
+                    message: "Enter employee's first name\n"
                 },
                 {
                     name: "last",
@@ -189,7 +197,7 @@ function viewMgmt() {
                 {
                     name: "role",
                     type: "input",
-                    message: "Enter employee's role id #:\nPathologist = 3\nHistotech = 4\nGrosser = 5\nTranscriptionist = 6\nOffice Clerk = 7\nJanitor = 8\n",
+                    message: "Enter employee's title id #: Refer to chart above",
                     validate: function(value) {
                         if (isNaN(value) === false) {
                           return true;
@@ -209,8 +217,6 @@ function viewMgmt() {
                 }   else if(roleId == 4 ||roleId == 5) {
                     mgmtId.push(1);
                 }
-
-                console.log(mgmtId);
                 
                 var query = "INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)";
                 connection.query(query, [answer.first, answer.last, roleId, mgmtId[0]], function (err, res) {
@@ -219,5 +225,74 @@ function viewMgmt() {
                     start();
                 })
             })
+    }
+
+    function updateEmp() {
+        inquirer
+            .prompt([
+                {
+                    name: "action",
+                    type: "list",
+                    message: "What do you want to update?",
+                    choices: ["Role ID", "Last name"]
+                },
+            ])
+            .then (function(answer) {
+                
+                switch (answer.action) {
+                    case "Role ID":
+                        // Show roles as reference
+                        var query = "SELECT id, title FROM role";
+                        connection.query(query, function (err, res) {
+                            if (err) throw (err);
+                            console.table(res);
+                        })
+                
+                        function rolid() {
+                            inquirer
+                                .prompt([
+                                    {
+                                        name: "name",
+                                        type: "input",
+                                        message: " What is the employees first name\n"
+                                    },
+                                        {
+                                        name: "role",
+                                        type: "input",
+                                        message: "Enter employee's new title id #: Refer to chart above",
+                                        validate: function(value) {
+                                            if (isNaN(value) === false) {
+                                              return true;
+                                            }
+                                            return false;
+                                          }
+                                        }
+                                ])
+                                .then (function(answerR) {
+                                    var queryR = "UPDATE employees SET role_id = ? WHERE first_name = ?";
+
+                                    connection.query(queryR, [answerR.role, answerR.name], function (err, res) {
+                                        if (err) throw (err);
+                                        console.table(res);
+                                        start();
+                                    });
+                                });
+                        }
+                        rolid();
+                    }
+                })
+                
+            }
+                // {
+                //     name: "last",
+                //     type: "input",
+                //     message: "Enter employee's last name" 
+                // },
+                
+            
+    
+
+    function delEmp() {
+
     }
 
