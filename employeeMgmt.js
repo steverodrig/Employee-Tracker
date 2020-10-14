@@ -391,19 +391,13 @@ function delEmp() {
 // View and edit department function
 function editDepts() {
 
-    var query = "SELECT * FROM department";
-    connection.query(query, function (err, res) {
-        if (err) throw (err);
-        console.table(res);
-    })
-
     inquirer
         .prompt([
             {
                 name: "frstact",
                 type: "list",
-                message: "Do you want to add a department?\n",
-                choices: ["Yes", "No\n"]
+                message: "Do you want to add a department?",
+                choices: ["Yes", "No", "View all departments\n"]
             }
         ])
         .then(function (ans) {
@@ -427,7 +421,7 @@ function editDepts() {
                         ])
                         .then(function (answer) {
                             var queryA = "INSERT INTO department (name) VALUES (?)";
-                            connection.query(queryA, [answer.depname], function(err, res) {
+                            connection.query(queryA, [answer.depname], function (err, res) {
                                 if (err) throw (err);
                                 console.table(res);
                                 start();
@@ -435,14 +429,14 @@ function editDepts() {
                         })
                     break;
 
-                case "No\n":
+                case "No":
                     inquirer
                         .prompt([
                             {
                                 name: "action",
                                 type: "list",
                                 message: "Do you want to delete a department?",
-                                choices: ["Yes", "Exit"]
+                                choices: ["Yes", "Go back", "Exit"]
                             }
                         ])
                         .then(function (answer) {
@@ -469,11 +463,153 @@ function editDepts() {
                                         })
                                     break;
 
+                                case "Go back":
+                                    start();
+                                    break;
+
                                 case "Exit":
                                     connection.end();
                                     break;
                             }
                         })
+                    break;
+
+                case "View all departments\n":
+                    var query = "SELECT * FROM department";
+                    connection.query(query, function (err, res) {
+                        if (err) throw (err);
+                        console.table(res);
+                    });
+                    editDepts();
+                    break;
+            }
+        })
+}
+
+// View and edit role function
+function editRoles() {
+
+    inquirer
+        .prompt([
+            {
+                name: "action",
+                type: "list",
+                message: "Do you want to add a role?",
+                choices: ["Yes", "No", "View all roles\n"]
+            }
+        ])
+        .then(function (ans) {
+
+            switch (ans.action) {
+
+                case "Yes":
+                    inquirer
+                        .prompt([
+                            {
+                                name: "rolname",
+                                type: "input",
+                                message: "What is the name of the new role?",
+                                validate: function (value) {
+                                    if (value.length == 0) {
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                            },
+                            {
+                                name: "salary",
+                                type: "input",
+                                message: "What is the salary?",
+                                validate: function (value) {
+                                    if (isNaN(value) === false) {
+                                        return true;
+                                    }
+                                    return false;
+                                }
+                            },
+                            {
+                                name: "dept",
+                                type: "list",
+                                message: "What department is the new role in?",
+                                choices: ["Pathology", "Histology", "Office", "Maintenance"]   
+                            }
+                        ])
+                        .then(function (answer) {
+                            var mgmId = [];
+                            var salary = parseInt(answer.salary);
+                            var dept = answer.dept
+                            if(dept === "Pathology") {
+                                mgmId.push(1);
+                            } else if(dept === "Histology") {
+                                mgmId.push(2);
+                            } else if(dept === "Office") {
+                                mgmId.push(3);
+                            } else if(dept === "Maintenance") {
+                                mgmId.push(4);
+                            }
+
+                            var queryA = "INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)";
+                            connection.query(queryA, [answer.rolname, salary, mgmId[0]], function (err, res) {
+                                if (err) throw (err);
+                                console.table(res);
+                                start();
+                            })
+                        })
+                    break;
+
+                case "No":
+                    inquirer
+                        .prompt([
+                            {
+                                name: "action",
+                                type: "list",
+                                message: "Do you want to delete a role?",
+                                choices: ["Yes", "Go back", "Exit"]
+                            }
+                        ])
+                        .then(function (answer) {
+
+                            switch (answer.action) {
+
+                                case "Yes":
+                                    inquirer
+                                        .prompt([
+                                            {
+                                                name: "role",
+                                                type: "list",
+                                                message: "Which role do you wish to delete?",
+                                                choices: ["Histology Manager", "Office Manager", "pathologist", "Histotech", "Grosser", "Transcriptionist", "Office Clerk", "Janitor", "Whiner"]
+                                            },
+                                        ])
+                                        .then(function (answer) {
+                                            var queryRole = "DELETE FROM role WHERE title = ?";
+                                            connection.query(queryRole, [answer.role], function (err, res) {
+                                                if (err) throw (err);
+                                                console.table(res);
+                                                start();
+                                            })
+                                        })
+                                    break;
+
+                                case "Go back":
+                                    start();
+                                    break;
+
+                                case "Exit":
+                                    connection.end();
+                                    break;
+                            }
+                        })
+                    break;
+
+                case "View all roles\n":
+                    var query = "SELECT * FROM role";
+                    connection.query(query, function (err, res) {
+                        if (err) throw (err);
+                        console.table(res);
+                    });
+                    editRoles();
+                    break;
             }
         })
 }
