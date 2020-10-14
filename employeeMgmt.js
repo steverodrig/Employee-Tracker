@@ -34,8 +34,8 @@ function start() {
                     editDepts();
                     break;
 
-                case "Edit departments":
-                    editDepts();
+                case "Edit roles":
+                    editRoles();
                     break;
 
                 case "Edit managers":
@@ -385,6 +385,96 @@ function delEmp() {
                 console.table(res);
                 start();
             });
+        })
+}
+
+// View and edit department function
+function editDepts() {
+
+    var query = "SELECT * FROM department";
+    connection.query(query, function (err, res) {
+        if (err) throw (err);
+        console.table(res);
+    })
+
+    inquirer
+        .prompt([
+            {
+                name: "frstact",
+                type: "list",
+                message: "Do you want to add a department?\n",
+                choices: ["Yes", "No\n"]
+            }
+        ])
+        .then(function (ans) {
+
+            switch (ans.frstact) {
+
+                case "Yes":
+                    inquirer
+                        .prompt([
+                            {
+                                name: "depname",
+                                type: "input",
+                                message: "What is the name of the new department?",
+                                validate: function (value) {
+                                    if (value.length == 0) {
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                            }
+                        ])
+                        .then(function (answer) {
+                            var queryA = "INSERT INTO department (name) VALUES (?)";
+                            connection.query(queryA, [answer.depname], function(err, res) {
+                                if (err) throw (err);
+                                console.table(res);
+                                start();
+                            })
+                        })
+                    break;
+
+                case "No\n":
+                    inquirer
+                        .prompt([
+                            {
+                                name: "action",
+                                type: "list",
+                                message: "Do you want to delete a department?",
+                                choices: ["Yes", "Exit"]
+                            }
+                        ])
+                        .then(function (answer) {
+
+                            switch (answer.action) {
+
+                                case "Yes":
+                                    inquirer
+                                        .prompt([
+                                            {
+                                                name: "dept",
+                                                type: "list",
+                                                message: "Which department do you wish to delete?",
+                                                choices: ["Pathology", "Histology", "Office", "Maintenance", "Whiners"]
+                                            },
+                                        ])
+                                        .then(function (answer) {
+                                            var queryD = "DELETE FROM department WHERE name = ?";
+                                            connection.query(queryD, [answer.dept], function (err, res) {
+                                                if (err) throw (err);
+                                                console.table(res);
+                                                start();
+                                            })
+                                        })
+                                    break;
+
+                                case "Exit":
+                                    connection.end();
+                                    break;
+                            }
+                        })
+            }
         })
 }
 
