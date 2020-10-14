@@ -34,8 +34,8 @@ function start() {
                     editDepts();
                     break;
 
-                case "Edit roles":
-                    editRoles();
+                case "Edit departments":
+                    editDepts();
                     break;
 
                 case "Edit managers":
@@ -139,160 +139,252 @@ function viewMgmt() {
             }
         })
 }
-    // Post employee view menu
-    function afterView() {
-        inquirer
-            .prompt({
+// Post employee view menu
+function afterView() {
+    inquirer
+        .prompt({
+            name: "action",
+            type: "list",
+            message: "What would you like to do?",
+            choices: ["Add an employee", "Update an employee", "Delete an employee", "Go back", "Exit"]
+        })
+        .then(function (answer) {
+            switch (answer.action) {
+                case "Add an employee":
+                    addEmp();
+                    break;
+
+                case "Update an employee":
+                    updateEmp();
+                    break;
+
+                case "Delete an employee":
+                    delEmp();
+                    break;
+
+                case "Go back":
+                    start();
+                    break;
+
+                case "Exit":
+                    connection.end();
+                    break;
+            }
+        });
+}
+// Add a new employee
+function addEmp() {
+
+    // Show roles as reference
+    var query = "SELECT * FROM role";
+    connection.query(query, function (err, res) {
+        if (err) throw (err);
+        console.table(res);
+    })
+
+    inquirer
+        .prompt([
+            {
+                name: "first",
+                type: "input",
+                message: "Enter employee's first name\n",
+                validate: function (value) {
+                    if (value.length == 0) {
+                        return false;
+                    }
+                    return true;
+                }
+            },
+            {
+                name: "last",
+                type: "input",
+                message: "Enter employee's last name",
+                validate: function (value) {
+                    if (value.length == 0) {
+                        return false;
+                    }
+                    return true;
+                }
+            },
+            {
+                name: "role",
+                type: "input",
+                message: "Enter employee's title id #: Refer to chart above",
+                validate: function (value) {
+                    if (isNaN(value) === false) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        ])
+        .then(function (answer) {
+
+            var mgmtId = []
+            var roleId = parseInt(answer.role);
+
+            // Push appropriate manager id#
+            if (roleId == 3 || roleId == 6 || roleId == 7 || roleId == 8) {
+                mgmtId.push(2)
+            } else if (roleId == 4 || roleId == 5) {
+                mgmtId.push(1);
+            }
+
+            var query = "INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)";
+            connection.query(query, [answer.first, answer.last, roleId, mgmtId[0]], function (err, res) {
+                if (err) throw (err);
+                console.table(res);
+                start();
+            })
+        })
+}
+// Update employee's last name or role
+function updateEmp() {
+    inquirer
+        .prompt([
+            {
                 name: "action",
                 type: "list",
-                message: "What would you like to do?",
-                choices: ["Add an employee", "Update an employee", "Delete an employee", "Go back", "Exit"]
-            })
-            .then(function (answer) {
-                switch (answer.action) {
-                    case "Add an employee":
-                        addEmp();
-                        break;
+                message: "What do you want to update?",
+                choices: ["Title", "Last name", "Exit"]
+            },
+        ])
+        .then(function (answer) {
 
-                    case "Update an employee":
-                        updateEmp();
-                        break;
+            switch (answer.action) {
+                //Update role
+                case "Title":
+                    // Show roles as reference
+                    var query = "SELECT id, title FROM role";
+                    connection.query(query, function (err, res) {
+                        if (err) throw (err);
+                        console.table(res);
+                    })
 
-                    case "Delete an employee":
-                        delEmp();
-                        break;
+                    function rolid() {
+                        inquirer
+                            .prompt([
+                                {
+                                    name: "name",
+                                    type: "input",
+                                    message: " Enter the employee's first name\n",
+                                    validate: function (value) {
+                                        if (value.length == 0) {
+                                            return false;
+                                        }
+                                        return true;
+                                    }
+                                },
+                                {
+                                    name: "role",
+                                    type: "input",
+                                    message: "Enter employee's new title id #: Refer to chart above",
+                                    validate: function (value) {
+                                        if (isNaN(value) === false) {
+                                            return true;
+                                        }
+                                        return false;
+                                    }
+                                }
+                            ])
+                            .then(function (answerR) {
+                                var queryR = "UPDATE employees SET role_id = ? WHERE first_name = ?";
 
-                    case "Go back":
-                        start();
-                        break;
+                                connection.query(queryR, [answerR.role, answerR.name], function (err, res) {
+                                    if (err) throw (err);
+                                    console.table(res);
+                                    start();
+                                });
+                            });
+                    }
+                    rolid();
+                    break;
 
-                    case "Exit":
-                        connection.end();
-                        break;
-                }
-            });
-    }
-    // Add a new employee
-    function addEmp() {
+                case "Last name":
 
-        // Show roles as reference
-        var query = "SELECT * FROM role";
-        connection.query(query, function (err, res) {
-            if (err) throw (err);
-            console.table(res);
+                    function lastName() {
+                        inquirer
+                            .prompt([
+                                {
+                                    name: "fname",
+                                    type: "input",
+                                    message: "Enter the employee's first name",
+                                    validate: function (value) {
+                                        if (value.length == 0) {
+                                            return false;
+                                        }
+                                        return true;
+                                    }
+                                },
+                                {
+                                    name: "lname",
+                                    type: "input",
+                                    message: "Enter the employee's new last name",
+                                    validate: function (value) {
+                                        if (value.length == 0) {
+                                            return false;
+                                        }
+                                        return true;
+                                    }
+                                }
+                            ])
+                            .then(function (answerL) {
+                                var queryL = "UPDATE employees SET last_name = ? WHERE first_name = ?";
+
+                                connection.query(queryL, [answerL.lname, answerL.fname], function (err, res) {
+                                    if (err) throw (err);
+                                    console.table(res);
+                                    start();
+                                });
+                            });
+                    }
+                    lastName();
+                    break;
+
+                case "Exit":
+                    connection.end();
+                    break;
+            }
         })
 
-        inquirer
-            .prompt([
-                {
-                    name: "first",
-                    type: "input",
-                    message: "Enter employee's first name\n"
-                },
-                {
-                    name: "last",
-                    type: "input",
-                    message: "Enter employee's last name" 
-                },
-                {
-                    name: "role",
-                    type: "input",
-                    message: "Enter employee's title id #: Refer to chart above",
-                    validate: function(value) {
-                        if (isNaN(value) === false) {
-                          return true;
-                        }
+}
+
+// Delete employee function
+function delEmp() {
+
+    inquirer
+        .prompt([
+            {
+                name: "fname",
+                type: "input",
+                message: "Enter the first name of employee you wish to delete",
+                validate: function (value) {
+                    if (value.length == 0) {
                         return false;
-                      }
                     }
-            ])
-            .then (function (answer) {
-               
-                var mgmtId = []
-                var roleId = parseInt(answer.role);
-                
-                // Push appropriate manager id#
-                if(roleId ==  3 ||roleId == 6 ||roleId == 7 ||roleId == 8) {
-                    mgmtId.push(2)
-                }   else if(roleId == 4 ||roleId == 5) {
-                    mgmtId.push(1);
+                    return true;
                 }
-                
-                var query = "INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)";
-                connection.query(query, [answer.first, answer.last, roleId, mgmtId[0]], function (err, res) {
-                    if (err) throw (err);
-                    console.table(res);
-                    start();
-                })
-            })
-    }
-
-    function updateEmp() {
-        inquirer
-            .prompt([
-                {
-                    name: "action",
-                    type: "list",
-                    message: "What do you want to update?",
-                    choices: ["Role ID", "Last name"]
-                },
-            ])
-            .then (function(answer) {
-                
-                switch (answer.action) {
-                    case "Role ID":
-                        // Show roles as reference
-                        var query = "SELECT id, title FROM role";
-                        connection.query(query, function (err, res) {
-                            if (err) throw (err);
-                            console.table(res);
-                        })
-                
-                        function rolid() {
-                            inquirer
-                                .prompt([
-                                    {
-                                        name: "name",
-                                        type: "input",
-                                        message: " What is the employees first name\n"
-                                    },
-                                        {
-                                        name: "role",
-                                        type: "input",
-                                        message: "Enter employee's new title id #: Refer to chart above",
-                                        validate: function(value) {
-                                            if (isNaN(value) === false) {
-                                              return true;
-                                            }
-                                            return false;
-                                          }
-                                        }
-                                ])
-                                .then (function(answerR) {
-                                    var queryR = "UPDATE employees SET role_id = ? WHERE first_name = ?";
-
-                                    connection.query(queryR, [answerR.role, answerR.name], function (err, res) {
-                                        if (err) throw (err);
-                                        console.table(res);
-                                        start();
-                                    });
-                                });
-                        }
-                        rolid();
+            },
+            {
+                name: "lname",
+                type: "input",
+                message: "Enter the last name of employee you wish to delete",
+                validate: function (value) {
+                    if (value.length == 0) {
+                        return false;
                     }
-                })
-                
+                    return true;
+                }
             }
-                // {
-                //     name: "last",
-                //     type: "input",
-                //     message: "Enter employee's last name" 
-                // },
-                
-            
-    
+        ])
+        .then(function (answer) {
+            var query = "DELETE FROM employees WHERE (first_name = ? AND last_name = ?)";
 
-    function delEmp() {
-
-    }
+            connection.query(query, [answer.fname, answer.lname], function (err, res) {
+                if (err) throw (err);
+                console.table(res);
+                start();
+            });
+        })
+}
 
