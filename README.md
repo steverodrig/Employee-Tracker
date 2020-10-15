@@ -23,7 +23,7 @@
  
   Navigate to the proper directory and from the command line enter 'node employeeMgmt.js'.  Follow the prompts to either view or alter data.
     ![image](https://user-images.githubusercontent.com/21253903/96077690-166b6980-0e76-11eb-878c-3ab6b7e7af58.png)
-    
+    <iframe src="https://drive.google.com/file/d/1XYkZx8OQkbVrzAR1yQnuo8ONHD8pclvS/preview" width="640" height="480"></iframe>
   ## Contributing
 
   Send me an email from link provided.
@@ -45,4 +45,4 @@
   Licensed under MIT.
 
   ## Links
-    <iframe src="https://drive.google.com/file/d/1XYkZx8OQkbVrzAR1yQnuo8ONHD8pclvS/preview" width="640" height="480"></iframe>
+    
