@@ -22,7 +22,7 @@ function start() {
             name: "action",
             type: "list",
             message: "What would you like to do?",
-            choices: ["View employees", "Edit departments", "Edit roles", "Edit managers", "Exit"]
+            choices: ["View employees", "Edit departments", "Edit roles", "Exit"]
         })
         .then(function (answer) {
             switch (answer.action) {
@@ -36,10 +36,6 @@ function start() {
 
                 case "Edit roles":
                     editRoles();
-                    break;
-
-                case "Edit managers":
-                    editMgmt();
                     break;
 
                 case "Exit":
@@ -531,20 +527,20 @@ function editRoles() {
                                 name: "dept",
                                 type: "list",
                                 message: "What department is the new role in?",
-                                choices: ["Pathology", "Histology", "Office", "Maintenance"]   
+                                choices: ["Pathology", "Histology", "Office", "Maintenance"]
                             }
                         ])
                         .then(function (answer) {
                             var mgmId = [];
                             var salary = parseInt(answer.salary);
                             var dept = answer.dept
-                            if(dept === "Pathology") {
+                            if (dept === "Pathology") {
                                 mgmId.push(1);
-                            } else if(dept === "Histology") {
+                            } else if (dept === "Histology") {
                                 mgmId.push(2);
-                            } else if(dept === "Office") {
+                            } else if (dept === "Office") {
                                 mgmId.push(3);
-                            } else if(dept === "Maintenance") {
+                            } else if (dept === "Maintenance") {
                                 mgmId.push(4);
                             }
 
